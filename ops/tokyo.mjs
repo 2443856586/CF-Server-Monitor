@@ -186,10 +186,14 @@ async function notify() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chat) throw new Error('缺少 Telegram 告警凭据');
+  const simulation = process.env.TOKYO_SIMULATION;
+  const title = simulation && simulation !== 'none'
+    ? `【验收演练】东京监控已主动触发 ${simulation}，正在核对拦截或回退结果。`
+    : '东京监控自动更新未完成，请查看运行记录。';
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chat,
-      text: `东京监控自动更新未完成，请查看运行记录。\nhttps://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}` }),
+      text: `${title}\nhttps://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}` }),
     signal: AbortSignal.timeout(30000),
   });
   const result = await response.json();
