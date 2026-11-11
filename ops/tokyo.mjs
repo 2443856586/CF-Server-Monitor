@@ -111,8 +111,8 @@ async function backupDatabase() {
   if (key.length !== 32) throw new Error('备份密钥必须是 32 字节');
   await mkdir(runtimePath, { recursive: true });
   const plain = `${runtimePath}/database.sql`;
-  wrangler('d1', 'export', 'cfsm-tokyo-db', '--remote', '--output', plain, '--skip-confirmation');
   try {
+    wrangler('d1', 'export', 'cfsm-tokyo-db', '--remote', '--output', plain, '--skip-confirmation');
     const iv = randomBytes(12);
     const cipher = createCipheriv('aes-256-gcm', key, iv);
     const ciphertext = Buffer.concat([cipher.update(await readFile(plain)), cipher.final()]);
