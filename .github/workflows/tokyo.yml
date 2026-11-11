@@ -1,0 +1,100 @@
+name: Tokyo Monitor Update
+
+on:
+  schedule:
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 无新提交时仍执行发布验收
+        type: boolean
+        default: false
+      simulation:
+        description: 仅用于受控失败演练
+        type: choice
+        options: [none, check_failure, health_failure]
+        default: none
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: tokyo-production
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TOKYO_SERVER_ID: ${{ vars.TOKYO_SERVER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: 同步上游应用代码
+        id: sync
+        run: node ops/sync-tokyo.mjs
+      - name: 检查发布兼容性
+        id: gate
+        run: |
+          node ops/tokyo.mjs guard
+          if [ "$SIMULATION" = 'check_failure' ]; then
+            echo '验收演练：检查阶段主动失败，禁止部署。'
+            exit 23
+          fi
+        env:
+          SIMULATION: ${{ inputs.simulation }}
+      - name: 安装锁定依赖
+        if: steps.sync.outputs.changed == 'true' || inputs.force_deploy || inputs.simulation == 'health_failure'
+        run: npm ci --no-audit --no-fund
+      - name: 测试、构建和部署预检查
+        if: steps.sync.outputs.changed == 'true' || inputs.force_deploy || inputs.simulation == 'health_failure'
+        run: |
+          npm run test:all
+          node --test ops/tokyo.test.mjs
+          npm run build:frontend
+          npx wrangler deploy --config wrangler.tokyo.jsonc --dry-run
+      - name: 加密备份、部署和健康核验
+        id: release
+        if: steps.sync.outputs.changed == 'true' || inputs.force_deploy || inputs.simulation == 'health_failure'
+        run: node ops/tokyo.mjs release
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.TOKYO_CF_API_TOKEN }}
+          TOKYO_BACKUP_KEY: ${{ secrets.TOKYO_BACKUP_KEY }}
+          TOKYO_SIMULATION: ${{ inputs.simulation }}
+      - name: 保存加密备份及发布记录
+        if: always() && steps.release.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cfsm-tokyo-${{ github.run_id }}
+          path: |
+            .tokyo-runtime/*.enc.json
+            .tokyo-runtime/release.json
+            .tokyo-runtime/rollback.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: 记录已验收版本
+        if: success() && steps.release.outcome == 'success'
+        run: |
+          git add ops/tokyo-state.json
+          git commit -m 'chore: 记录东京已验收部署'
+          git push origin HEAD:main
+      - name: 保留最近两次成功发布备份
+        if: success() && steps.release.outcome == 'success'
+        run: node ops/tokyo.mjs prune
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 更新失败通知
+        if: failure()
+        run: node ops/tokyo.mjs notify
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

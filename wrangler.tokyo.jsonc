@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cfsm-tokyo",
+  "account_id": "fa65a1d7446f86a39ddf078c15f70f9d",
+  "main": "src/index.js",
+  "compatibility_date": "2024-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "workers_dev": true,
+  "assets": {"directory": "./dist", "binding": "ASSETS"},
+  "triggers": {"crons": ["*/1 * * * *", "0 * * * *"]},
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "cfsm-tokyo-db",
+    "database_id": "71d6f694-e182-4d6a-839d-4dfbb5842247"
+  }],
+  "durable_objects": {"bindings": [{"name": "METRICS_BROADCASTER", "class_name": "MetricsBroadcaster"}]},
+  "migrations": [{"tag": "v1", "new_sqlite_classes": ["MetricsBroadcaster"]}]
+}

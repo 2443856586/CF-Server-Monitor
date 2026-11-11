@@ -1,0 +1,10 @@
+{
+  "releases": [
+    {
+      "source_sha": "612027cbdb248bc2df7e69f9d01b5cefb4d14fa8",
+      "version_id": "a65980db-82f1-4e10-9282-2f40b2e077cd",
+      "deployed_at": "2026-11-11T02:22:05.793884Z",
+      "backup_run_id": "initial"
+    }
+  ]
+}

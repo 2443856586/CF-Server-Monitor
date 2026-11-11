@@ -40,3 +40,4 @@ Thumbs.db
 # Cloudflare Workers
 .wrangler/
 dist/
+.tokyo-runtime/
