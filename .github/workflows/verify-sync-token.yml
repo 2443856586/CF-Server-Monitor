@@ -1,0 +1,24 @@
+name: Verify Tokyo Sync Token
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: 验证合并历史中的工作流变更不会阻断业务同步
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          base=$(git rev-parse HEAD)
+          printf '\n# upstream-like permission test\n' >> .github/workflows/tokyo.yml
+          printf 'permission fixture\n' > .tokyo-sync-permission-check
+          git add .github/workflows/tokyo.yml .tokyo-sync-permission-check
+          git commit -m 'test: upstream-like workflow change'
+          git restore --source="$base" --staged --worktree -- .github/workflows/tokyo.yml
+          git commit -m 'test: preserve local workflow tree'
+          git push origin HEAD:"refs/heads/tokyo-sync-verification-${GITHUB_RUN_ID}"
+          git push origin --delete "tokyo-sync-verification-${GITHUB_RUN_ID}"
