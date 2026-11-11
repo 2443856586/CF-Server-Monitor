@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "source_sha": "ef9a071dfdfed3a5217db928ff54fba3d43caaec",
+      "version_id": "887e2958-4350-40dc-95c9-36a6fa081504",
+      "previous_version_id": "a65980db-82f1-4e10-9282-2f40b2e077cd",
+      "deployed_at": "2026-11-11T02:43:48.525Z",
+      "backup_run_id": "42947902663",
+      "health": {
+        "checked_at": "2026-11-11T02:43:45.639Z",
+        "version": "2.8.7 Beta7",
+        "last_updated": 1794364945770,
+        "history_points": 6,
+        "agent_version": "v1.1.2"
+      }
+    },
+    {
       "source_sha": "612027cbdb248bc2df7e69f9d01b5cefb4d14fa8",
       "version_id": "a65980db-82f1-4e10-9282-2f40b2e077cd",
       "deployed_at": "2026-11-11T02:22:05.793884Z",
