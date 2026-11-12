@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "source_sha": "3d40bfebe21b8bf6dd8a334d207e1d15876ac68b",
+      "version_id": "b2fea56c-cd74-470e-8837-1cce21b7479c",
+      "previous_version_id": "9126fdd0-b2c3-41a5-b276-9b30531c4fc5",
+      "deployed_at": "2026-11-12T07:09:34.802Z",
+      "backup_run_id": "43173090908",
+      "health": {
+        "checked_at": "2026-11-12T07:09:31.669Z",
+        "version": "2.8.7 Beta7",
+        "last_updated": 1794467325380,
+        "history_points": 5,
+        "agent_version": "v1.1.2"
+      }
+    },
+    {
       "source_sha": "5de3c5fc24aadc3d72c767ce44ad3194782a8356",
       "version_id": "9126fdd0-b2c3-41a5-b276-9b30531c4fc5",
       "previous_version_id": "887e2958-4350-40dc-95c9-36a6fa081504",
@@ -11,20 +25,6 @@
         "version": "2.8.7 Beta7",
         "last_updated": 1794365385121,
         "history_points": 8,
-        "agent_version": "v1.1.2"
-      }
-    },
-    {
-      "source_sha": "ef9a071dfdfed3a5217db928ff54fba3d43caaec",
-      "version_id": "887e2958-4350-40dc-95c9-36a6fa081504",
-      "previous_version_id": "a65980db-82f1-4e10-9282-2f40b2e077cd",
-      "deployed_at": "2026-11-11T02:43:48.525Z",
-      "backup_run_id": "42947902663",
-      "health": {
-        "checked_at": "2026-11-11T02:43:45.639Z",
-        "version": "2.8.7 Beta7",
-        "last_updated": 1794364945770,
-        "history_points": 6,
         "agent_version": "v1.1.2"
       }
     }
